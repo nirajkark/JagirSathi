@@ -2,37 +2,42 @@ import fitz
 import os
 from dotenv import load_dotenv
 from langchain_groq import ChatGroq
+
 load_dotenv()
-
-
+api_key = os.getenv("CHAT_GROQ_API")
 def extract_text_from_pdf(pdf_path):
     """Extract text from a PDF file."""
-    doc= fitz.open(strean=pdf_path.read(), filetype="pdf")
+    doc = fitz.open(stream=pdf_path.read(), filetype="pdf")
 
     text = ""
     for page in doc:
         text += page.get_text()
 
     return text
+
 def ask_expert(prompt, max_token=500):
     """Send a prompt to the expert system and get a response."""
-    llm = ChatGroq(
-        model="qwen/qwen3-32b",
-        temperature=0,
-        max_tokens=max_token,  # Use the parameter here instead of None
-        reasoning_format="parsed",
-        timeout=None,
-        max_retries=2,
-        api_key=os.getenv("CHAT_GROQ_API")
-    )
     
-    response = llm.invoke(
-        [{"role": "user", "content": prompt}]
-    )
+    # Check if API key exists
     
-    return response.content
-def fetch_linkedIn_jobs(search_query, location="Nepal",rows=60):
+    if not api_key:
+        raise ValueError("CHAT_GROQ_API environment variable not found. Please check your .env file.")
     
-    run = client.actor("BHzefUZlZRKWxkTck").call(run_input=run_input)
-def fetch_naukari_jobs(search_query, location="india",rows=60):
-    pass
+    try:
+        llm = ChatGroq(
+            model="llama-3.3-70b-versatile",
+            temperature=0,
+            max_tokens=max_token,
+            timeout=None,
+            max_retries=2,
+            api_key=api_key
+        )
+        
+        response = llm.invoke(
+            [{"role": "user", "content": prompt}]
+        )
+        
+        return response.content
+    
+    except Exception as e:
+        raise Exception(f"Error calling Groq API: {str(e)}")
