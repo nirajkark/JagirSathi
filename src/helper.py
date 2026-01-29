@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from langchain_groq import ChatGroq
 load_dotenv()
 
+
 def extract_text_from_pdf(pdf_path):
     """Extract text from a PDF file."""
     doc= fitz.open(strean=pdf_path.read(), filetype="pdf")
@@ -15,18 +16,23 @@ def extract_text_from_pdf(pdf_path):
     return text
 def ask_expert(prompt, max_token=500):
     """Send a prompt to the expert system and get a response."""
-    import openai
-
-    load_dotenv()
-    openai.api_key = os.getenv("CHAT_GROQ_API")
-
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=prompt,
-        max_tokens=max_token,
-        n=1,
-        stop=None,
-        temperature=0.7,
+    llm = ChatGroq(
+        model="qwen/qwen3-32b",
+        temperature=0,
+        max_tokens=max_token,  # Use the parameter here instead of None
+        reasoning_format="parsed",
+        timeout=None,
+        max_retries=2,
+        api_key=os.getenv("CHAT_GROQ_API")
     )
-
-    return response.choices[0].text.strip()
+    
+    response = llm.invoke(
+        [{"role": "user", "content": prompt}]
+    )
+    
+    return response.content
+def fetch_linkedIn_jobs(search_query, location="Nepal",rows=60):
+    
+    run = client.actor("BHzefUZlZRKWxkTck").call(run_input=run_input)
+def fetch_naukari_jobs(search_query, location="india",rows=60):
+    pass
