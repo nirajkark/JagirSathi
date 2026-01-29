@@ -1,7 +1,26 @@
+# Web Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+
+# Existing Streamlit (keep if you want both versions)
 streamlit
+
+# AI/LLM
 openai
-requests
-pymupdf
-python-dotenv
-apify-client
 langchain-groq
+
+# PDF Processing
+pymupdf
+
+# Environment & Configuration
+python-dotenv
+
+# Job Scraping
+apify-client
+
+# HTTP Requests
+requests
+
+# Validation
+pydantic==2.5.0
