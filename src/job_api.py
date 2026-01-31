@@ -1,23 +1,44 @@
-from dotenv import load_dotenv
-from langchain_groq import ChatGroq
-from apify_client import ApifyClient
 import os
+from dotenv import load_dotenv
+from apify_client import ApifyClient
 
 load_dotenv()
-apify_client = ApifyClient(os.getenv("APIFY_API_TOKEN"))
 
-def fetch_linkedIn_jobs(search_query, location="Nepal", rows=30):
+APIFY_API_TOKEN = os.getenv("APIFY_API_TOKEN")
+
+if not APIFY_API_TOKEN:
+    raise ValueError("APIFY_API_TOKEN not found in environment variables")
+
+apify_client = ApifyClient(APIFY_API_TOKEN)
+
+
+def fetch_linkedIn_jobs(search_query, location="United States", rows=20):
+    """Fetch LinkedIn jobs using Apify LinkedIn Jobs Scraper"""
+
+    print(f"[DEBUG] Searching for '{search_query}' in '{location}'")
+
     run_input = {
-        "title": search_query,
+        "searchKeywords": search_query,   # ✅ FIXED
         "location": location,
-        "rows": rows,
+        "maxJobs": rows,                  # ✅ FIXED
         "proxy": {
             "useApifyProxy": True,
             "apifyProxyGroups": ["RESIDENTIAL"],
-        }  
+        }
     }
 
-    run = apify_client.actor("BHzefUZlZRKWxkTck").call(run_input=run_input)
-    jobs = list(apify_client.dataset(run["defaultDatasetId"]).iterate_items())  
-    return jobs
+    try:
+        run = apify_client.actor(
+            "BHzefUZlZRKWxkTck"
+        ).call(run_input=run_input)
 
+        dataset_id = run["defaultDatasetId"]
+        jobs = list(apify_client.dataset(dataset_id).iterate_items())
+
+        print(f"[DEBUG] Jobs fetched: {len(jobs)}")
+
+        return jobs
+
+    except Exception as e:
+        print(f"[ERROR] LinkedIn fetch failed: {e}")
+        return []

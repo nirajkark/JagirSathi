@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JagirSathi - AI Job Finder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen p-8">
+    <div class="max-w-4xl mx-auto">
+        <header class="text-center mb-10">
+            <h1 class="text-5xl font-extrabold text-blue-500 mb-2">JagirSathi 💼</h1>
+            <p class="text-gray-400 text-lg">Your AI-Powered Career Companion</p>
+        </header>
+
+        <div class="bg-gray-900 border border-gray-800 p-8 rounded-2xl shadow-xl mb-10">
+            <form action="/analyze" method="post" enctype="multipart/form-data">
+                <label class="block text-sm font-medium mb-4">Upload Resume (PDF format only)</label>
+                <div class="flex items-center gap-4">
+                    <input type="file" name="file" required class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full transition-all">Analyze</button>
+                </div>
+            </form>
+        </div>
+
+        {% if error %}
+        <div class="bg-red-900/50 border border-red-500 text-red-200 p-4 rounded-lg mb-6">{{ error }}</div>
+        {% endif %}
+
+        {% if success %}
+        <div class="space-y-8 animate-fade-in">
+            <section class="bg-gray-900 p-6 rounded-xl border border-gray-800">
+                <h2 class="text-2xl font-bold text-blue-400 mb-4">📄 Resume Summary</h2>
+                <div class="prose prose-invert max-w-none">{{ summary | replace('\n', '<br>') | safe }}</div>
+            </section>
+
+            <section class="bg-gray-900 p-6 rounded-xl border border-gray-800">
+                <h2 class="text-2xl font-bold text-yellow-500 mb-4">🛠️ Skill Gaps</h2>
+                <div class="prose prose-invert max-w-none">{{ skills_gap | replace('\n', '<br>') | safe }}</div>
+            </section>
+
+            <section class="bg-gray-900 p-6 rounded-xl border border-gray-800">
+                <h2 class="text-2xl font-bold text-green-500 mb-4">💼 Top Jobs for "{{ search_terms }}"</h2>
+                <div class="space-y-4 mt-4">
+                    {% for job in jobs %}
+                    <div class="p-4 bg-gray-800 rounded-lg hover:border-blue-500 border border-transparent transition-colors">
+                        <h3 class="text-xl font-bold text-white">{{ job.get('title') }}</h3>
+                        <p class="text-gray-400 italic">{{ job.get('companyName') }}</p>
+                        <p class="text-sm text-gray-500">📍 {{ job.get('location') }}</p>
+                        <a href="{{ job.get('link') }}" target="_blank" class="text-blue-400 mt-2 inline-block font-semibold">View on LinkedIn →</a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
